@@ -3,8 +3,8 @@ import { Cell } from "../Cell";
 import { Colors } from "../Colors";
 
 export enum FigureNames {
-    KING = "Фигура",
-    QUEEN = "Король",
+    KING = "Король",
+    QUEEN = "Ферзь",
     ROOK = "Ладья",
     KNIGHT = "Конь",
     BISHOP = "Слон",
