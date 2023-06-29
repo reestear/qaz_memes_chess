@@ -249,6 +249,13 @@ export class Cell {
 
     colorKing(oppColor: string, updColor: string): void {
 
+        // for(let i = 0; i < 8; i++){
+        //     for(let j = 0; j < 8; j++){
+        //         const cell = this.board.getCell(i, j);
+        //         cell.color = ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
+        //     }
+        // }
+
         for(let i = 0; i < 8; i++){
             for(let j = 0; j < 8; j++){
                 const cell = this.board.getCell(i, j);
@@ -256,7 +263,7 @@ export class Cell {
                     console.log(cell.color)
                     cell.color = (updColor === 'orange') ? Colors.ORANGE : ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
                 }
-                // else cell.color = ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
+                else if(cell.figure?.name !== FigureNames.KING) cell.color = ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
             }
         }
     }
