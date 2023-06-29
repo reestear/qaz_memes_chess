@@ -203,20 +203,6 @@ export class Cell {
         }
     }
 
-    // function isKingUnderAttack(opponentPieces, kingPosition):
-    // for each piece in opponentPieces:
-    //     if piece.type is "queen" or "rook" or "bishop":
-    //         if piece can attack in a straight line or along a diagonal to kingPosition:
-    //             return true
-    //     else if piece.type is "knight":
-    //         if piece can attack in an L-shaped pattern to kingPosition:
-    //             return true
-    //     else if piece.type is "pawn":
-    //         if piece can attack diagonally to kingPosition:
-    //             return true
-    
-    // return false
-
     isKingUnderAttackSome(myColor: string, oppColor: string): boolean {
         for(let i = 0; i < 8; i++){
             for(let j = 0; j < 8; j++){
@@ -270,6 +256,7 @@ export class Cell {
                     console.log(cell.color)
                     cell.color = (updColor === 'orange') ? Colors.ORANGE : ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
                 }
+                // else cell.color = ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
             }
         }
     }
