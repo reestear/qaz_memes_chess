@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { Board } from "./models/Board";
-import { BoardCt } from "./components/BoardCt"
-import { Player } from "./models/Player";
-import { Colors } from "./models/Colors";
+import { BoardCt } from "./components/BoardCt";
 import { LostFigures } from "./components/LostFigures";
 import { Timer } from "./components/Timer";
+import { Board } from "./models/Board";
+import { Colors } from "./models/Colors";
+import { Player } from "./models/Player";
 
 function App() {
     const [board, setBoard] = useState(new Board());
@@ -32,6 +32,7 @@ function App() {
     const swapPlayer = () => {
         setCurrentPlayer(currentPlayer?.color === Colors.WHITE ? blackPlayer : whitePlayer)
     }
+    // some comment
 
     return (
       <div className="flex justify-center items-center gap-40 w-full min-h-[100vh] bg-slate-300">
