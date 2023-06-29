@@ -64,11 +64,15 @@ export class Cell {
     checkKingOnVertical(from: Cell, oppColor: string): boolean {
         const y = from.y;
         for(let i = from.x + 1; i < 8; i++){
+            console.log(this.board.getCell(i, y).figure?.name)
+
             if(this.checkForCheck(i, y, oppColor)) 
                 return true;
             if(this.board.getCell(i, y).figure) break;
         }
         for(let i = from.x - 1; i >= 0; i--){
+            console.log(this.board.getCell(i, y).figure?.name)
+            
             if(this.checkForCheck(i, y, oppColor)) 
                 return true;
             if(this.board.getCell(i, y).figure) break;
@@ -93,9 +97,15 @@ export class Cell {
 
     checkKingOnHorizontal(from: Cell, oppColor: string): boolean {
         const x = from.x;
-        for(let i = 0; i < 8; i++){
+        for(let i = from.y + 1; i < 8; i++){
             if(this.checkForCheck(x, i, oppColor)) 
                 return true;
+            if(this.board.getCell(x, i).figure) break;
+        }
+        for(let i = from.y - 1; i >= 0; i--){
+            if(this.checkForCheck(x, i, oppColor)) 
+                return true;
+            if(this.board.getCell(x, i).figure) break;
         }
         return false;
     }
@@ -127,23 +137,35 @@ export class Cell {
     }
 
     checkKingOnDiagonal(from: Cell, oppColor: string): boolean {
-        const min_min = Math.min(from.x, from.y);
-        let startX = from.x - min_min, startY = from.y - min_min;
-        for(let i = 0; i < 8; i++){
-            const newX = startX + i, newY = startY + i;
-            if(newX == 8 || newY == 8) break;
-
-            if(this.checkForCheck(newX, newY, oppColor))
+        const startX = from.x, startY = from.y;
+        let x = startX + 1, y = startY + 1;
+        while(x < 8 && y < 8){
+            if(this.checkForCheck(x, y, oppColor))
                 return true;
+            if(this.board.getCell(x, y).figure) break;
+            x++; y++;
+            
         }
-        const min_pl = Math.min(from.x, 7 - from.y);
-        startX = startX = from.x - min_pl, startY = from.y + min_pl;
-        for(let i = 0; i < 8; i++){
-            const newX = startX + i, newY = startY - i;
-            if(newX == 8 || newY == -1) break;
-
-            if(this.checkForCheck(newX, newY, oppColor))
+        x = startX + 1, y = startY - 1;
+        while(x < 8 && y >= 0){
+            if(this.checkForCheck(x, y, oppColor))
                 return true;
+            if(this.board.getCell(x, y).figure) break;
+            x++; y--;
+        }
+        x = startX - 1, y = startY - 1;
+        while(x >= 0 && y >= 0){
+            if(this.checkForCheck(x, y, oppColor))
+                return true;
+            if(this.board.getCell(x, y).figure) break;
+            x--; y--;
+        }
+        x = startX - 1, y = startY + 1;
+        while(x >= 0 && y < 8){
+            if(this.checkForCheck(x, y, oppColor))
+                return true;
+            if(this.board.getCell(x, y).figure) break;
+            x--; y++;
         }
 
         return false;
@@ -203,7 +225,8 @@ export class Cell {
                     if(cell.figure?.name === FigureNames.QUEEN){
                         if(this.checkKingOnDiagonal(this.board.getCell(i, j), oppColor)
                         || this.checkKingOnHorizontal(this.board.getCell(i, j), oppColor)
-                        || this.checkKingOnVertical(this.board.getCell(i, j), oppColor)) 
+                        || this.checkKingOnVertical(this.board.getCell(i, j), oppColor)
+                        ) 
                             return true;
 
                     }
@@ -238,13 +261,14 @@ export class Cell {
         return this.isKingUnderAttackSome(Colors.WHITE, Colors.BLACK)
     }
 
-    colorKing(myColor: string): void {
+    colorKing(oppColor: string, updColor: string): void {
+
         for(let i = 0; i < 8; i++){
             for(let j = 0; j < 8; j++){
                 const cell = this.board.getCell(i, j);
-                if(cell.figure?.name === FigureNames.KING && cell.figure?.color === myColor){
+                if(cell.figure?.name === FigureNames.KING && cell.figure?.color === oppColor){
                     console.log(cell.color)
-                    cell.color = Colors.ORANGE;
+                    cell.color = (updColor === 'orange') ? Colors.ORANGE : ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
                 }
             }
         }
@@ -270,8 +294,10 @@ export class Cell {
 
             target.setFigure(this.figure);
             this.figure = null;
-            if(this.isKingUnderAttackBlack()) console.log("BLACK KING GET CHECKED"), this.colorKing(Colors.WHITE)
-            if(this.isKingUnderAttackWhite()) console.log("WHITE KING GET CHECKED"), this.colorKing(Colors.BLACK)
+            if(this.isKingUnderAttackBlack()) console.log("BLACK KING GET CHECKED"), this.colorKing(Colors.BLACK, Colors.ORANGE)
+            else this.colorKing(Colors.BLACK, "none")
+            if(this.isKingUnderAttackWhite()) console.log("WHITE KING GET CHECKED"), this.colorKing(Colors.WHITE, Colors.ORANGE)
+            else this.colorKing(Colors.WHITE, "none")
         }
     }
 }
