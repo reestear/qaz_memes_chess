@@ -41,6 +41,29 @@ export class Figure {
     }
 
     moveFigure(target: Cell) : boolean {
+        if (target.figure && this.name === 'Пешка' && this.color === "white") {
+            const audioElement = new Audio('src/kaz-memes-chess-audio/tore.mp3');
+            this.logo = 'src/assets/white-pawn-action.png';
+
+            audioElement.play();
+
+            audioElement.addEventListener('ended', () => {
+                this.logo = 'src/assets/white-pawn.png';
+            });
+        }
+
+        if (target.figure && this.name === 'Пешка' && this.color === "black") {
+            const audioElement = new Audio('src/kaz-memes-chess-audio/kairosh.mp3');
+            this.logo = 'src/assets/white-pawn-action.png';
+
+            audioElement.play();
+
+            audioElement.addEventListener('ended', () => {
+                this.logo = 'src/assets/white-pawn.png';
+            });
+        }
+
+
         return true;
     }
 }

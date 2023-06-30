@@ -8,7 +8,6 @@ interface CellProps {
 } 
 
 export const CellCt = ({cell, selected, click}: CellProps) => {
-    console.log(cell);
     return (
         <div 
             onClick={() => click(cell)}

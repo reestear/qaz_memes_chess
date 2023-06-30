@@ -1,5 +1,6 @@
 import { Cell } from "../Cell";
 import { Colors } from "../Colors";
+import { Board } from "../Board";
 import { Figure, FigureNames } from "./Figure";
 
 import blackLogo from "../../assets/black-pawn.png"
@@ -47,7 +48,7 @@ export class Pawn extends Figure {
     }
 
     moveFigure(target: Cell): boolean {
-        super.moveFigure(target);
+        super.moveFigure(target)
 
         this.isFirstStep = false;
 

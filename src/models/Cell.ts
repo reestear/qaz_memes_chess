@@ -64,15 +64,11 @@ export class Cell {
     checkKingOnVertical(from: Cell, oppColor: string): boolean {
         const y = from.y;
         for(let i = from.x + 1; i < 8; i++){
-            console.log(this.board.getCell(i, y).figure?.name)
-
             if(this.checkForCheck(i, y, oppColor)) 
                 return true;
             if(this.board.getCell(i, y).figure) break;
         }
-        for(let i = from.x - 1; i >= 0; i--){
-            console.log(this.board.getCell(i, y).figure?.name)
-            
+        for(let i = from.x - 1; i >= 0; i--){            
             if(this.checkForCheck(i, y, oppColor)) 
                 return true;
             if(this.board.getCell(i, y).figure) break;
@@ -260,7 +256,6 @@ export class Cell {
             for(let j = 0; j < 8; j++){
                 const cell = this.board.getCell(i, j);
                 if(cell.figure?.name === FigureNames.KING && cell.figure?.color === oppColor){
-                    console.log(cell.color)
                     cell.color = (updColor === 'orange') ? Colors.ORANGE : ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
                 }
                 else if(cell.figure?.name !== FigureNames.KING) cell.color = ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
@@ -282,9 +277,10 @@ export class Cell {
     moveFigure(target: Cell) {
         if (this.figure && this.figure?.canMove(target)) {
             this.figure.moveFigure(target);
-            if (target.figure) {
-                this.addLostFigure(target.figure)
-            }
+
+        if (this.figure && target.figure) {
+            this.addLostFigure(this.figure);
+        }
 
             target.setFigure(this.figure);
             this.figure = null;
