@@ -2,7 +2,9 @@ import { Board } from "./Board";
 import { Colors } from "./Colors";
 import { Bishop } from "./figures/Bishop";
 import { Figure, FigureNames } from "./figures/Figure";
+import { King } from "./figures/King";
 import { Knight } from "./figures/Knight";
+import { Pawn } from "./figures/Pawn";
 import { Queen } from "./figures/Queen";
 import { Rook } from "./figures/Rook";
 
@@ -43,8 +45,8 @@ export class Cell {
         return false;
     }
 
-    checkForCheck(x: number, y: number, oppColor: string) : boolean{
-        if(this.board.getCell(x, y).figure?.name === FigureNames.KING && this.board.getCell(x, y).figure?.color === oppColor) 
+    checkForCheck(x: number, y: number, oppColor: string, board: Board) : boolean{
+        if(board.getCell(x, y).figure?.name === FigureNames.KING && board.getCell(x, y).figure?.color === oppColor) 
             return true;
             
         return false;
@@ -65,17 +67,17 @@ export class Cell {
         return true;
     }
 
-    checkKingOnVertical(from: Cell, oppColor: string): boolean {
+    checkKingOnVertical(from: Cell, oppColor: string, board: Board): boolean {
         const y = from.y;
         for(let i = from.x + 1; i < 8; i++){
 
-            if(this.checkForCheck(i, y, oppColor)) 
+            if(this.checkForCheck(i, y, oppColor, board)) 
                 return true;
             if(this.board.getCell(i, y).figure) break;
         }
         for(let i = from.x - 1; i >= 0; i--){
             
-            if(this.checkForCheck(i, y, oppColor)) 
+            if(this.checkForCheck(i, y, oppColor, board)) 
                 return true;
             if(this.board.getCell(i, y).figure) break;
         }
@@ -97,15 +99,15 @@ export class Cell {
         return true;
     }
 
-    checkKingOnHorizontal(from: Cell, oppColor: string): boolean {
+    checkKingOnHorizontal(from: Cell, oppColor: string, board: Board): boolean {
         const x = from.x;
         for(let i = from.y + 1; i < 8; i++){
-            if(this.checkForCheck(x, i, oppColor)) 
+            if(this.checkForCheck(x, i, oppColor, board)) 
                 return true;
             if(this.board.getCell(x, i).figure) break;
         }
         for(let i = from.y - 1; i >= 0; i--){
-            if(this.checkForCheck(x, i, oppColor)) 
+            if(this.checkForCheck(x, i, oppColor, board)) 
                 return true;
             if(this.board.getCell(x, i).figure) break;
         }
@@ -138,42 +140,42 @@ export class Cell {
         return true;
     }
 
-    checkKingOnDiagonal(from: Cell, oppColor: string): boolean {
+    checkKingOnDiagonal(from: Cell, oppColor: string, board: Board): boolean {
         const startX = from.x, startY = from.y;
         let x = startX + 1, y = startY + 1;
         while(x < 8 && y < 8){
-            if(this.checkForCheck(x, y, oppColor))
+            if(this.checkForCheck(x, y, oppColor, board))
                 return true;
-            if(this.board.getCell(x, y).figure) break;
+            if(board.getCell(x, y).figure) break;
             x++; y++;
             
         }
         x = startX + 1, y = startY - 1;
         while(x < 8 && y >= 0){
-            if(this.checkForCheck(x, y, oppColor))
+            if(this.checkForCheck(x, y, oppColor, board))
                 return true;
-            if(this.board.getCell(x, y).figure) break;
+            if(board.getCell(x, y).figure) break;
             x++; y--;
         }
         x = startX - 1, y = startY - 1;
         while(x >= 0 && y >= 0){
-            if(this.checkForCheck(x, y, oppColor))
+            if(this.checkForCheck(x, y, oppColor, board))
                 return true;
-            if(this.board.getCell(x, y).figure) break;
+            if(board.getCell(x, y).figure) break;
             x--; y--;
         }
         x = startX - 1, y = startY + 1;
         while(x >= 0 && y < 8){
-            if(this.checkForCheck(x, y, oppColor))
+            if(this.checkForCheck(x, y, oppColor, board))
                 return true;
-            if(this.board.getCell(x, y).figure) break;
+            if(board.getCell(x, y).figure) break;
             x--; y++;
         }
 
         return false;
     }
 
-    checkKingOnKnight(from: Cell, oppColor: string) : boolean {
+    checkKingOnKnight(from: Cell, oppColor: string, board: Board) : boolean {
         const dy = [-2, -1, 1, 2, 2, 1, -1, -2];
         const dx = [1, 2, 2, 1, -1, -2, -2, -1];
         const startX = from.x, startY = from.y;
@@ -181,55 +183,55 @@ export class Cell {
         for(let i = 0; i < 8; i++){
             const newX = startX + dx[i], newY = startY + dy[i];
             if(this.isInBorders(newX, newY)) {
-                if(this.checkForCheck(newX, newY, oppColor)) return true;
+                if(this.checkForCheck(newX, newY, oppColor, board)) return true;
             }
         }
         return false;
     }
 
-    checkKingOnPawn(from: Cell, oppColor: string) : boolean {
+    checkKingOnPawn(from: Cell, oppColor: string, board: Board) : boolean {
         const startX = from.x, startY = from.y;
         if(oppColor === Colors.WHITE) {
-            if(this.isInBorders(startX + 1, startY + 1) && this.checkForCheck(startX + 1, startY + 1, oppColor)) return true;
-            else if(this.isInBorders(startX - 1, startY + 1) && this.checkForCheck(startX - 1, startY + 1, oppColor)) return true;
+            if(this.isInBorders(startX + 1, startY + 1) && this.checkForCheck(startX + 1, startY + 1, oppColor, board)) return true;
+            else if(this.isInBorders(startX - 1, startY + 1) && this.checkForCheck(startX - 1, startY + 1, oppColor, board)) return true;
             return false;
         }
         else {
-            if(this.isInBorders(startX - 1, startY - 1) && this.checkForCheck(startX - 1, startY - 1, oppColor)) return true;
-            else if(this.isInBorders(startX + 1, startY - 1) && this.checkForCheck(startX + 1, startY - 1, oppColor)) return true;
+            if(this.isInBorders(startX - 1, startY - 1) && this.checkForCheck(startX - 1, startY - 1, oppColor, board)) return true;
+            else if(this.isInBorders(startX + 1, startY - 1) && this.checkForCheck(startX + 1, startY - 1, oppColor, board)) return true;
             // console.log(`For Pawn on: ${startX},${startY}: ${startX - 1}, ${startY + 1}`);
             return false;
         }
     }
 
-    isKingUnderAttackSome(myColor: string, oppColor: string): boolean {
+    isKingUnderAttackSome(myColor: string, oppColor: string, board: Board): boolean {
         for(let i = 0; i < 8; i++){
             for(let j = 0; j < 8; j++){
                 const cell = this.board.getCell(i, j);
                 if(cell.figure?.color === myColor) {
                     if(cell.figure?.name === FigureNames.QUEEN){
-                        if(this.checkKingOnDiagonal(this.board.getCell(i, j), oppColor)
-                        || this.checkKingOnHorizontal(this.board.getCell(i, j), oppColor)
-                        || this.checkKingOnVertical(this.board.getCell(i, j), oppColor)
+                        if(this.checkKingOnDiagonal(this.board.getCell(i, j), oppColor, board)
+                        || this.checkKingOnHorizontal(this.board.getCell(i, j), oppColor, board)
+                        || this.checkKingOnVertical(this.board.getCell(i, j), oppColor, board)
                         ) 
                             return true;
 
                     }
                     if(cell.figure?.name === FigureNames.BISHOP){
-                        if(this.checkKingOnDiagonal(this.board.getCell(i, j), oppColor)) 
+                        if(this.checkKingOnDiagonal(this.board.getCell(i, j), oppColor, board)) 
                             return true;
                     }
                     if(cell.figure?.name === FigureNames.ROOK){
-                        if(this.checkKingOnHorizontal(this.board.getCell(i, j), oppColor)
-                        || this.checkKingOnVertical(this.board.getCell(i, j), oppColor)) 
+                        if(this.checkKingOnHorizontal(this.board.getCell(i, j), oppColor, board)
+                        || this.checkKingOnVertical(this.board.getCell(i, j), oppColor, board)) 
                             return true;
                     }
                     if(cell.figure?.name === FigureNames.KNIGHT){
-                        if(this.checkKingOnKnight(this.board.getCell(i, j), oppColor)) 
+                        if(this.checkKingOnKnight(this.board.getCell(i, j), oppColor, board)) 
                             return true;
                     }
                     if(cell.figure?.name === FigureNames.PAWN){
-                        if(this.checkKingOnPawn(this.board.getCell(i, j), oppColor))
+                        if(this.checkKingOnPawn(this.board.getCell(i, j), oppColor, board))
                             return true;
                     }
                 }
@@ -238,12 +240,12 @@ export class Cell {
         return false;
     }
 
-    isKingUnderAttackWhite(): boolean {
-        return this.isKingUnderAttackSome(Colors.BLACK, Colors.WHITE);
+    isKingUnderAttackWhite(board: Board): boolean {
+        return this.isKingUnderAttackSome(Colors.BLACK, Colors.WHITE, board);
     }
 
-    isKingUnderAttackBlack(): boolean {
-        return this.isKingUnderAttackSome(Colors.WHITE, Colors.BLACK)
+    isKingUnderAttackBlack(board: Board): boolean {
+        return this.isKingUnderAttackSome(Colors.WHITE, Colors.BLACK, board)
     }
 
     colorKing(oppColor: string, updColor: string): void {
@@ -291,6 +293,241 @@ export class Cell {
         this.figure.cell = this;
     }
 
+    parseVertical(arr: Cell[], cell: Cell, myColor: Colors, oppColor: Colors): void {
+        const startX = cell.x, startY = cell.y;
+        
+        for(let i = startY + 1; i < 8; i++){
+            const cell = this.board.getCell(startX, i);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+        for(let i = startY - 1; i >= 0; i--){
+            const cell = this.board.getCell(startX, i);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+    }
+
+    parseHorizontal(arr: Cell[], cell: Cell, myColor: Colors, oppColor: Colors): void {
+        const startX = cell.x, startY = cell.y;
+        
+        for(let i = startX + 1; i < 8; i++){
+            const cell = this.board.getCell(i, startY);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+        for(let i = startX - 1; i >= 0; i--){
+            const cell = this.board.getCell(i, startY);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+    }
+
+    parseDiagonal(arr: Cell[], cell: Cell, myColor: Colors, oppColor: Colors): void {
+        const startX = cell.x, startY = cell.y;
+        
+        for(let i = 1; this.isInBorders(startX + i, startY + i); i++){
+            const newX = startX + i, newY = startY + i;
+            const cell = this.board.getCell(newX, newY);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+        for(let i = 1; this.isInBorders(startX - i, startY + i); i++){
+            const newX = startX - i, newY = startY + i;
+            const cell = this.board.getCell(newX, newY);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+        for(let i = 1; this.isInBorders(startX - i, startY - i); i++){
+            const newX = startX - i, newY = startY - i;
+            const cell = this.board.getCell(newX, newY);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+        for(let i = 1; this.isInBorders(startX + i, startY - i); i++){
+            const newX = startX + i, newY = startY - i;
+            const cell = this.board.getCell(newX, newY);
+            if(cell.figure?.color !== myColor){
+                arr.push(cell);
+                if(cell.figure?.color === oppColor) break;
+            }
+            else break;
+        }
+    }
+
+    parseKnight(arr: Cell[], cell: Cell, myColor: Colors, oppColor: Colors) : void {
+        const startX = cell.x, startY = cell.y;
+        const dy = [-2, -1, 1, 2, 2, 1, -1, -2];
+        const dx = [1, 2, 2, 1, -1, -2, -2, -1];
+
+        for(let i = 0; i < 8; i++){
+            const newX = startX + dx[i], newY = startY + dy[i];
+            if(this.isInBorders(newX, newY)) {
+                const cell = this.board.getCell(newX, newY);
+                if(cell.figure?.color !== myColor){
+                    arr.push(cell);
+                }
+                else break;
+            }
+        }
+    }
+
+    parsePawn(arr: Cell[], cell: Cell, myColor: Colors, oppColor: Colors) :void {
+        const startX = cell.x, startY = cell.y;
+
+        if(oppColor === Colors.WHITE) {
+            if(this.isInBorders(startX + 1, startY + 1)) {
+                const cell = this.board.getCell(startX + 1, startY + 1);
+                if(cell.figure?.color !== myColor){
+                    arr.push(cell);
+                }
+            }
+            else if(this.isInBorders(startX - 1, startY + 1)) {
+                const cell = this.board.getCell(startX - 1, startY + 1);
+                if(cell.figure?.color !== myColor){
+                    arr.push(cell);
+                }
+            }
+        }
+        else {
+            if(this.isInBorders(startX - 1, startY - 1)) {
+                const cell = this.board.getCell(startX - 1, startY - 1);
+                if(cell.figure?.color !== myColor){
+                    arr.push(cell);
+                }
+            }
+            else if(this.isInBorders(startX + 1, startY - 1)) {
+                const cell = this.board.getCell(startX + 1, startY - 1);
+                if(cell.figure?.color !== myColor){
+                    arr.push(cell);
+                }
+            }
+        }
+    }
+
+    parseKing(arr: Cell[], cell: Cell, myColor: Colors, oppColor: Colors) :void {
+        const startX = cell.x, startY = cell.y;
+        const dy = [-1, -1, 0, 1, 1, 1, 0, -1];
+        const dx = [0, 1, 1, 1, 0, -1, -1, -1];
+
+        for(let i = 0; i < 8; i++){
+            const newX = startX + dx[i], newY = startY + dy[i];
+            if(this.isInBorders(newX, newY)){
+                const cell = this.board.getCell(newX, newY);
+                if(cell.figure?.color !== myColor){
+                    arr.push(cell);
+                }
+            }
+        }
+    }
+
+    getLegalMoves(cell: Cell, myColor: Colors, oppColor: Colors, fig: Figure): Cell[] {
+        const arr: Cell[] = []
+
+        if(fig.name === FigureNames.QUEEN){
+            this.parseVertical(arr, cell, myColor, oppColor);
+            this.parseHorizontal(arr, cell, myColor, oppColor);
+            this.parseDiagonal(arr, cell, myColor, oppColor);
+        }
+        else if(fig.name === FigureNames.BISHOP){
+            this.parseDiagonal(arr, cell, myColor, oppColor);
+        }
+        else if(fig.name === FigureNames.ROOK){
+            this.parseVertical(arr, cell, myColor, oppColor);
+            this.parseHorizontal(arr, cell, myColor, oppColor);
+        }
+        else if(fig.name === FigureNames.KNIGHT){
+            this.parseKnight(arr, cell, myColor, oppColor);
+        }
+        else if(fig.name === FigureNames.PAWN){
+            this.parsePawn(arr, cell, myColor, oppColor);
+        }
+        else {
+            this.parseKing(arr, cell, myColor, oppColor);
+        }
+
+        // for(let i = 0; i < arr.length; i++) console.log(arr[i].figure?.name)
+        console.log("ARR: " + arr)
+        return arr;
+    }
+
+    isKingMated(myColor: Colors, oppColor: Colors): boolean {
+        if(!this.isKingUnderAttackSome(myColor, oppColor, this.board)) return false;
+
+        for(let x = 0; x < 8; x++){
+            for(let y = 0; y < 8; y++){
+                if(this.board.getCell(x, y).figure?.color === myColor){
+                    const cell = this.board.getCell(x, y);
+                    const fig = cell.figure?.name === FigureNames.BISHOP ? new Bishop(myColor, cell)
+                                    : cell.figure?.name === FigureNames.KING ? new King(myColor, cell)
+                                    : cell.figure?.name === FigureNames.KNIGHT ? new Knight(myColor, cell)
+                                    : cell.figure?.name === FigureNames.PAWN ? new Pawn(myColor, cell)
+                                    : cell.figure?.name === FigureNames.QUEEN ? new Queen(myColor, cell)
+                                    : new Rook(myColor, cell);
+                    // console.log(fig)
+
+                    const arr = this.getLegalMoves(cell, myColor, oppColor, fig);
+                    for (let ind = 0; ind < arr.length; ind++) {
+                        const item = arr[ind];
+
+                        const second = item.figure?.name === FigureNames.BISHOP ? new Bishop(myColor, item)
+                                    : item.figure?.name === FigureNames.KING ? new King(myColor, item)
+                                    : item.figure?.name === FigureNames.KNIGHT ? new Knight(myColor, item)
+                                    : item.figure?.name === FigureNames.PAWN ? new Pawn(myColor, item)
+                                    : item.figure?.name === FigureNames.QUEEN ? new Queen(myColor, item)
+                                    : item.figure?.name === FigureNames.ROOK ? new Rook(myColor, item)
+                                    : null;
+                                    
+                        this.board.getCell(item.x, item.y).setFigure(fig);
+                        this.board.getCell(cell.x, cell.y).figure = null;
+
+                        if(!this.isKingUnderAttackSome(myColor, oppColor, this.board)) {
+                            if(second === null) this.board.getCell(item.x, item.y).figure = null;
+                            else this.board.getCell(item.x, item.y).setFigure(second);
+
+                            this.board.getCell(cell.x, cell.y).setFigure(fig);
+                            return false;
+                        }
+                        else {
+                            if(second === null) this.board.getCell(item.x, item.y).figure = null;
+                            else this.board.getCell(item.x, item.y).setFigure(second);
+                            this.board.getCell(cell.x, cell.y).setFigure(fig);
+                        }
+                    }
+                }
+            }
+        }
+        return true
+    }
+
+    isKingMatedWhite(): boolean {
+        return this.isKingMated(Colors.WHITE, Colors.BLACK);
+    }
+    isKingMatedBlack(): boolean {
+        return this.isKingMated(Colors.BLACK, Colors.WHITE);
+    }
+
     moveFigure(target: Cell) {
         if (this.figure && this.figure?.canMove(target)) {
             this.figure.moveFigure(target);
@@ -301,11 +538,14 @@ export class Cell {
             target.setFigure(this.figure);
             this.figure = null;
 
-            if(this.isKingUnderAttackBlack()) console.log("BLACK KING GET CHECKED"), this.colorKing(Colors.BLACK, Colors.ORANGE)
+            if(this.isKingUnderAttackBlack(this.board)) console.log("BLACK KING GET CHECKED"), this.colorKing(Colors.BLACK, Colors.ORANGE)
             else this.colorKing(Colors.BLACK, "none")
-            if(this.isKingUnderAttackWhite()) console.log("WHITE KING GET CHECKED"), this.colorKing(Colors.WHITE, Colors.ORANGE)
+            if(this.isKingUnderAttackWhite(this.board)) console.log("WHITE KING GET CHECKED"), this.colorKing(Colors.WHITE, Colors.ORANGE)
             else this.colorKing(Colors.WHITE, "none")
             this.pawnPromotion();
+            
+            if(this.isKingMatedWhite()) console.log("WHITE KING GET MATED");
+            if(this.isKingMatedBlack()) console.log("BLACK KING GET MATED");
         }
     }
 }
