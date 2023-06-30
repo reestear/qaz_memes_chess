@@ -1,6 +1,10 @@
 import { Board } from "./Board";
 import { Colors } from "./Colors";
+import { Bishop } from "./figures/Bishop";
 import { Figure, FigureNames } from "./figures/Figure";
+import { Knight } from "./figures/Knight";
+import { Queen } from "./figures/Queen";
+import { Rook } from "./figures/Rook";
 
 export class Cell {
     readonly x: number;
@@ -64,14 +68,12 @@ export class Cell {
     checkKingOnVertical(from: Cell, oppColor: string): boolean {
         const y = from.y;
         for(let i = from.x + 1; i < 8; i++){
-            console.log(this.board.getCell(i, y).figure?.name)
 
             if(this.checkForCheck(i, y, oppColor)) 
                 return true;
             if(this.board.getCell(i, y).figure) break;
         }
         for(let i = from.x - 1; i >= 0; i--){
-            console.log(this.board.getCell(i, y).figure?.name)
             
             if(this.checkForCheck(i, y, oppColor)) 
                 return true;
@@ -187,18 +189,15 @@ export class Cell {
 
     checkKingOnPawn(from: Cell, oppColor: string) : boolean {
         const startX = from.x, startY = from.y;
-        if(oppColor === oppColor) {
-            let newX = startX + 1, newY = startY + 1;
-            if(this.isInBorders(newX, newY) && this.checkForCheck(newX, newY, oppColor)) return true;
-            newX = startX + 1, newY = startY - 1;
-            if(this.isInBorders(newX, newY) && this.checkForCheck(newX, newY, oppColor)) return true;
+        if(oppColor === Colors.WHITE) {
+            if(this.isInBorders(startX + 1, startY + 1) && this.checkForCheck(startX + 1, startY + 1, oppColor)) return true;
+            else if(this.isInBorders(startX - 1, startY + 1) && this.checkForCheck(startX - 1, startY + 1, oppColor)) return true;
             return false;
         }
         else {
-            let newX = startX - 1, newY = startY - 1;
-            if(this.isInBorders(newX, newY) && this.checkForCheck(newX, newY, oppColor)) return true;
-            newX = startX - 1, newY = startY + 1;
-            if(this.isInBorders(newX, newY) && this.checkForCheck(newX, newY, oppColor)) return true;
+            if(this.isInBorders(startX - 1, startY - 1) && this.checkForCheck(startX - 1, startY - 1, oppColor)) return true;
+            else if(this.isInBorders(startX + 1, startY - 1) && this.checkForCheck(startX + 1, startY - 1, oppColor)) return true;
+            // console.log(`For Pawn on: ${startX},${startY}: ${startX - 1}, ${startY + 1}`);
             return false;
         }
     }
@@ -249,22 +248,35 @@ export class Cell {
 
     colorKing(oppColor: string, updColor: string): void {
 
-        // for(let i = 0; i < 8; i++){
-        //     for(let j = 0; j < 8; j++){
-        //         const cell = this.board.getCell(i, j);
-        //         cell.color = ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
-        //     }
-        // }
-
         for(let i = 0; i < 8; i++){
             for(let j = 0; j < 8; j++){
                 const cell = this.board.getCell(i, j);
                 if(cell.figure?.name === FigureNames.KING && cell.figure?.color === oppColor){
-                    console.log(cell.color)
+                    // console.log(cell.color)
                     cell.color = (updColor === 'orange') ? Colors.ORANGE : ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
                 }
                 else if(cell.figure?.name !== FigureNames.KING) cell.color = ((i + j) % 2 === 1) ? Colors.BLACK : Colors.WHITE;
             }
+        }
+    }
+
+    setRandomPromotion(cell: Cell, color: Colors): void{
+        const num = Math.random();
+        if(num >= 0.75) cell.setFigure(new Queen(color, cell))
+        else if(num >= 0.5) cell.setFigure(new Bishop(color, cell))
+        else if(num >= 0.25) cell.setFigure(new Knight(color, cell))
+        else cell.setFigure(new Rook(color, cell))
+
+    }
+
+    pawnPromotion(): void {
+        for(let x = 0; x < 8; x++){
+            const cell = this.board.getCell(x, 0);
+            if(cell.figure?.name === FigureNames.PAWN && cell.figure.color === Colors.WHITE) this.setRandomPromotion(cell, Colors.WHITE);
+        }
+        for(let x = 0; x < 8; x++){
+            const cell = this.board.getCell(x, 7);
+            if(cell.figure?.name === FigureNames.PAWN && cell.figure.color === Colors.BLACK) this.setRandomPromotion(cell, Colors.BLACK);
         }
     }
 
@@ -288,10 +300,12 @@ export class Cell {
 
             target.setFigure(this.figure);
             this.figure = null;
+
             if(this.isKingUnderAttackBlack()) console.log("BLACK KING GET CHECKED"), this.colorKing(Colors.BLACK, Colors.ORANGE)
             else this.colorKing(Colors.BLACK, "none")
             if(this.isKingUnderAttackWhite()) console.log("WHITE KING GET CHECKED"), this.colorKing(Colors.WHITE, Colors.ORANGE)
             else this.colorKing(Colors.WHITE, "none")
+            this.pawnPromotion();
         }
     }
 }
